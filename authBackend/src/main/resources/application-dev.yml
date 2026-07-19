@@ -1,0 +1,54 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: ${MYSQL_URL}
+    username: ${MYSQL_ROOT_USERNAME}
+    password: ${MYSQL_ROOT_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+    show-sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+            google:
+                client-id: ${GOOGLE_CLIENT_ID:test-google-client-id}
+                client-secret: ${GOOGLE_CLIENT_SECRET:test-google-client-secret}
+                scope:
+                    - profile
+                    - email
+            github:
+                client-id: ${GITHUB_CLIENT_ID:test-github-client-id}
+                client-secret: ${GITHUB_CLIENT_SECRET:test-github-client-secret}
+                redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"# Not Needed but it is hard codded redirect-url for github
+                scope:
+                    - read:user
+                    - user:email
+
+app:
+  cors:
+    frontend-url: http://localhost:5173,
+  auth:
+    frontend:
+      success-url: http://localhost:5173/auth/success
+      failure-url: http://localhost:5173/auth/failure
+
+
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    issuer: ${JWT_ISSUER}
+    access-ttl-seconds: ${JWT_ACCESS_TTL_SECONDS}
+    refresh-ttl-seconds: ${JWT_REFRESH_TTL_SECONDS}
+    refresh-token-cookie-name: ${JWT_REFRESH_TOKEN_COOKIE_NAME}
+    access-token-cookie-name: ${JWT_ACCESS_TOKEN_COOKIE_NAME}
+    cookie-secure: ${JWT_COOKIE_SECURE}
+    cookie-http-only: ${JWT_COOKIE_HTTP_ONLY}
+    cookie-same-site: ${JWT_COOKIE_SAME_SITE}
+    cookie-domain: ${JWT_COOKIE_DOMAIN}
