@@ -14,24 +14,16 @@ export default function ThemeToggle() {
   }, [theme]);
 
   return (
-    <ToggleGroup
-      type="single"
-      value={theme}
+    <ToggleGroup type="single" value={theme}
       onValueChange={(value) => {
         if (value) setTheme(value);
-      }}
-      className="bg-muted rounded-full p-2"
-    >
-      <ToggleGroupItem
-        value="light"
-        className=" rounded-full w-6 h-6 data-[state=on]:bg-background data-[state=on]:text-foreground hover:bg-gray-700"
-      >
+      }} className="bg-muted rounded-full p-2">
+      <ToggleGroupItem value="light"
+        className=" rounded-full w-6 h-6 data-[state=on]:bg-background data-[state=on]:text-foreground hover:bg-gray-700">
         <Sun className="h-0.01 w-0.01" />
       </ToggleGroupItem>
-      <ToggleGroupItem
-        value="dark"
-        className=" rounded-full w-6 h-6 data-[state=on]:bg-background data-[state=on]:text-foreground hover:bg-gray-400 "
-      >
+      <ToggleGroupItem value="dark"
+        className=" rounded-full w-6 h-6 data-[state=on]:bg-background data-[state=on]:text-foreground hover:bg-gray-400 ">
         <Moon className="h-0.01 w-0.01" />
       </ToggleGroupItem>
     </ToggleGroup>

@@ -1,5 +1,6 @@
 package com.example.authBackend.service.implementation;
 
+import com.example.authBackend.Enum.Provider;
 import com.example.authBackend.Enum.Role;
 import com.example.authBackend.api.request.LoginRequest;
 import com.example.authBackend.api.response.TokenResponse;
@@ -49,9 +50,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public TokenResponse loginUser(LoginRequest loginRequest, HttpServletResponse response) {
-        authenticationService.authenticate(loginRequest.email(), loginRequest.password());
         User user = userRepository.findByEmail(loginRequest.email()).orElseThrow(() ->
                 new BadCredentialsException("Invalid Email"));
+
+        if (user.getProvider() == Provider.GOOGLE){
+            throw new BadCredentialsException("You can't access this you used Google Previously Please use that for security purpose");
+        }
+
+        if (user.getProvider() == Provider.GITHUB){
+            throw new BadCredentialsException("You can't access this you used Github Previously Please use that for security purpose");
+        }
+        authenticationService.authenticate(loginRequest.email(), loginRequest.password());
         if (!user.isEnabled()) {
             throw new BadCredentialsException("User is disabled");
         }

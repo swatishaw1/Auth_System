@@ -69,7 +69,7 @@ public class CookieService {
                 .maxAge(0)
                 .path("/")
                 .sameSite(cookieSameSite);
-        if (cookieDomain!=null || !cookieDomain.isEmpty()){
+        if (cookieDomain!=null && !cookieDomain.isEmpty()){
             responseCookieBuilder.domain(cookieDomain);
         }
         ResponseCookie responseCookie = responseCookieBuilder.build();
@@ -88,7 +88,7 @@ public class CookieService {
                 .maxAge(0)
                 .path("/")
                 .sameSite(cookieSameSite);
-        if (cookieDomain!=null || !cookieDomain.isEmpty()){
+        if (cookieDomain!=null && !cookieDomain.isEmpty()){
             accessCookieBuilder.domain(cookieDomain);
         }
         ResponseCookie responseCookie = accessCookieBuilder.build();

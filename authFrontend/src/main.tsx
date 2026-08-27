@@ -9,6 +9,10 @@ import Services from './pages/Services.tsx';
 import RootLayout from './pages/RootLayout.tsx';
 import { Toaster } from 'react-hot-toast';
 import UserDashboard from './pages/users/UserDashboard.tsx';
+import UserProfile from './pages/users/UserProfile.tsx';
+import UserLayout from './pages/users/UserLayout.tsx';
+import OAuthSuccess from './pages/OAuthSuccess.tsx';
+import OAuthFailure from './pages/OAuthFailure.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -20,8 +24,13 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/signup" element={<SignUp />} />
         <Route path="/about" element={<About />} />
         <Route path="/services" element={<Services />} />
-        <Route path="/dashboard" element={<UserDashboard />} />
+        <Route element={<UserLayout />}>
+          <Route path="dashboard" element={<UserDashboard />} />
+          <Route path="dashboard/profile" element={<UserProfile />} />
+        </Route>
+        <Route path="/oauth/success" element={<OAuthSuccess />} />
+        <Route path="/oauth/failure" element={<OAuthFailure />} />
       </Route>
     </Routes>
   </BrowserRouter>,
-)
+);

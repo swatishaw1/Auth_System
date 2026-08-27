@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,7 +14,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public Authentication authenticate(String email, String password) {
+    public void authenticate(String email, String password) {
         try {
             /*String provider = loginRequest.provider();
             switch (provider.toLowerCase()) {
@@ -35,9 +34,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                                                                     loginRequest.password()));
                 }
             }*/
-            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
         } catch (Exception e) {
-            throw new BadCredentialsException("Invalid Email or Password");
+            throw new BadCredentialsException("Invalid Password");
         }
     }
 }

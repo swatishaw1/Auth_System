@@ -36,8 +36,8 @@ app:
     frontend-url: http://localhost:5173,
   auth:
     frontend:
-      success-url: http://localhost:5173/auth/success
-      failure-url: http://localhost:5173/auth/failure
+      success-url: http://localhost:5173/oauth/success
+      failure-url: http://localhost:5173/oauth/failure
 
 
 security:

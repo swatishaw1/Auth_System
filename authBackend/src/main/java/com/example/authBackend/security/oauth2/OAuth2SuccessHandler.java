@@ -3,6 +3,7 @@ package com.example.authBackend.security.oauth2;
 import com.example.authBackend.model.User;
 import com.example.authBackend.repository.UserRepository;
 import com.example.authBackend.security.CookieService;
+import com.example.authBackend.service.RefreshTokenService;
 import com.example.authBackend.utils.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,6 +26,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final JwtService jwtUtil;
     private final UserRepository userRepository;
+    private final RefreshTokenService refreshTokenService;
     private final CookieService cookieService;
 
     @Value("${app.auth.frontend.success-url}")
@@ -39,7 +41,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             log.warn("response already committed cannot redirect after OAuth2 success.");
             return;
         }
-        System.out.println(authentication.getPrincipal().getClass());
+        // System.out.println(authentication.getPrincipal().getClass());
 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
@@ -55,13 +57,16 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             throw new IllegalStateException("OAuth2 user not found in DB after successful login: " + email);
         }
         String jwt = jwtUtil.generateAccessToken(user);
-        String refreshToken = jwtUtil.generateRefreshedToken(user, UUID.randomUUID().toString());
+        String newJti = UUID.randomUUID().toString();
+        String refreshToken = jwtUtil.generateRefreshedToken(user, newJti);
+
+        refreshTokenService.createOrUpdate(user, newJti);
         cookieService.attachAccessTokenCookie(response, jwt, (int) jwtUtil.getAccessTokenValiditySeconds());
         cookieService.attachRefreshCookie(response,refreshToken, (int) jwtUtil.getRefreshTokenValiditySeconds());
         log.info("OAuth2 login successful for [{}] via [{}]", email, user.getProvider());
 
         // redirect the user's browser to the frontend callback with the jwt, refreshToken
-        response.getWriter().write("Login Successful");
-        /*getRedirectStrategy().sendRedirect(request, response, defaultFrontendRedirectUri);*/
+        //response.getWriter().write("Login Successful");
+        getRedirectStrategy().sendRedirect(request, response, defaultFrontendRedirectUri);
     }
 }

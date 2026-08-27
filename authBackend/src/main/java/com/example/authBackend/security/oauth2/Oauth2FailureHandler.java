@@ -46,7 +46,7 @@ public class Oauth2FailureHandler extends SimpleUrlAuthenticationFailureHandler 
 
         response.addHeader(HttpHeaders.SET_COOKIE, errorCookie.toString());
 
-        response.getWriter().write("Login failure");
-        /*getRedirectStrategy().sendRedirect(request, response, frontendUri);*/
+        //response.getWriter().write("Login failure");
+        getRedirectStrategy().sendRedirect(request, response, frontendUri);
     }
 }

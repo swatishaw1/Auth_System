@@ -9,11 +9,17 @@ import toast from "react-hot-toast";
 import { loginUser } from "@/services/AuthService";
 import type LoginData from "@/models/loginData";
 import type ErrorResponse from "@/response/ErrorResponse";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircleIcon } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
+import useAuth from "@/auth/store";
+import OAuth2Buttons from "@/components/OAuth2Buttons";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState(null);
+  const login = useAuth(state => state.login);
   const [loginData, setLoginData] = useState<LoginData>({
     email: "",
     password: ""
@@ -37,19 +43,26 @@ export default function LoginPage() {
       return;
     }
     try {
-      const userInfo = await loginUser(loginData);
-      // console.log(userInfo);
+      setLoading(true);
+      // const userInfo = await loginUser(loginData);
+      const userInfo = await login(loginData);
+      console.log(userInfo);
       toast.success("User Logged In Successfully");
       setLoginData({
         email: "",
         password: ""
       });
       navigate("/dashboard");
-    } catch (error: ErrorResponse) {
-      console.log(error.response);
-      console.log(error.response.data);
-      console.log(error.response.data.message);
-      setError(error.response.data);
+    } catch (error: any) {
+        console.error(error);
+
+        if (error.response?.data?.message) {
+            setError(error.response.data.message);
+        } else {
+            setError("Unable to connect to the server.");
+        }
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -63,6 +76,15 @@ export default function LoginPage() {
           </div>
           {/* Form */}
           <form className="space-y-5" onSubmit={onHandleSubmitForm}>
+              {error && (
+                <Alert variant="destructive" className="max-w-md">
+                <AlertCircleIcon />
+                <AlertTitle>Login Failed</AlertTitle>
+                <AlertDescription>
+                  {error || "An error occurred while logging in."}
+                </AlertDescription>
+              </Alert>
+              )}
             <div className="space-y-2">
               {/* Email */}
               <Label htmlFor="email">Email</Label>
@@ -75,7 +97,7 @@ export default function LoginPage() {
               <Input id="password" type="password" placeholder="Enter your password" name="password" value={loginData.password} onChange={onHandleLoginInputChange} />
             </div>
 
-            <Button className="w-full">Login</Button>
+            <Button className="w-full cursor-pointer"> {loading?<> <Spinner/> Please Wait...</>:"Login"}</Button>
           </form>
 
           <div className="my-6 flex items-center">
@@ -86,16 +108,7 @@ export default function LoginPage() {
 
 
           {/* OAuth */}
-          <div className="space-y-3">
-            <Button variant="outline" className="w-full">
-              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="mr-2 h-4 w-4" />
-              Continue with Google
-            </Button>
-            <Button variant="outline" className="w-full">
-              <FaGithub className="mr-2 h-4 w-4" />
-              Continue with GitHub
-            </Button>
-          </div>
+          <OAuth2Buttons/>
           <p className="mt-6 text-center text-sm text-muted-foreground"> Don't have an account?{" "}
             <NavLink to={"/SignUp"} className="font-medium text-foreground hover:underline">Sign Up</NavLink>
           </p>

@@ -7,6 +7,10 @@ import { NavLink, useNavigate } from "react-router";
 import React, { useState, type FormEvent } from "react";
 import toast from "react-hot-toast";
 import { registerUser } from "@/services/AuthService";
+import { Spinner } from "@/components/ui/spinner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircleIcon } from "lucide-react";
+import OAuth2Buttons from "@/components/OAuth2Buttons";
 
 export default function SignupPage() {
   const [data, setData] = useState({
@@ -50,6 +54,7 @@ export default function SignupPage() {
 
     //Form Submit Error Success
     try {
+      setLoading(true);
       const signUpInfo = await registerUser(data);
       console.log(signUpInfo);
       toast.success("User Register Successfully");
@@ -59,9 +64,16 @@ export default function SignupPage() {
         password: ""
       });
       navigate("/login");//navigate to login
-    } catch (error) {
-      console.log(error);
-      toast.error("User is not Registered");
+    } catch (error:any) {
+      console.error(error);
+
+        if (error.response?.data?.message) {
+            setError(error.response.data.message);
+        } else {
+            setError("Unable to connect to the server.");
+        }
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -75,6 +87,15 @@ export default function SignupPage() {
           </div>
 
           <form className="space-y-5" onSubmit={handleFormSubmit}>
+            {error && (
+                <Alert variant="destructive" className="max-w-md">
+                <AlertCircleIcon />
+                <AlertTitle>SignUp Failed</AlertTitle>
+                <AlertDescription>
+                  {error || "An error occurred while creating Account in."}
+                </AlertDescription>
+              </Alert>
+              )}
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
               <Input id="name" type="text" placeholder="John Doe" name="name" value={data.name} onChange={onHandleInputChange} />
@@ -90,7 +111,7 @@ export default function SignupPage() {
               <Input id="password" type="password" placeholder="Create a password" name="password" value={data.password} onChange={onHandleInputChange} />
             </div>
 
-            <Button className="w-full">Create Account</Button>
+            <Button className="w-full cursor-pointer"> {loading?<> <Spinner/> Please Wait...</>:"Create Account"}</Button>
           </form>
 
           <div className="my-6 flex items-center">
@@ -99,16 +120,8 @@ export default function SignupPage() {
             <div className="h-px flex-1 bg-border" />
           </div>
 
-          <div className="space-y-3">
-            <Button variant="outline" className="w-full">
-              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="mr-2 h-4 w-4" />
-              Continue with Google
-            </Button>
-
-            <Button variant="outline" className="w-full">
-              <FaGithub className="mr-2 h-4 w-4" />Continue with GitHub
-            </Button>
-          </div>
+          {/* OAuth2 Buttons */}
+          <OAuth2Buttons/>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Already have an account?{" "}
