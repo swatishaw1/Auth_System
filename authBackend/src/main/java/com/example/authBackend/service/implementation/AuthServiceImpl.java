@@ -6,33 +6,37 @@ import com.example.authBackend.api.request.LoginRequest;
 import com.example.authBackend.api.response.TokenResponse;
 import com.example.authBackend.api.request.RefreshTokenRequest;
 import com.example.authBackend.dto.UserDTO;
+import com.example.authBackend.model.ForgetPassword;
 import com.example.authBackend.model.RefreshToken;
 import com.example.authBackend.model.User;
+import com.example.authBackend.repository.ForgetPasswordRepository;
 import com.example.authBackend.repository.UserRepository;
 import com.example.authBackend.security.CookieService;
-import com.example.authBackend.service.AuthenticationService;
-import com.example.authBackend.service.RefreshTokenService;
+import com.example.authBackend.service.*;
 import com.example.authBackend.utils.JwtService;
-import com.example.authBackend.service.AuthService;
-import com.example.authBackend.service.UserService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
+
+import java.time.Instant;
+import java.util.*;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
@@ -42,6 +46,12 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenService refreshTokenService;
     private final JwtService jwtService;
     private final CookieService cookieService;
+    private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
+
+    @Value("${spring.otp.validation.time}")
+    private Integer otpValidationTime;
+    private final ForgetPasswordRepository forgetPasswordRepository;
 
     @Override
     public UserDTO registerUser(UserDTO userDTO) {
@@ -51,7 +61,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public TokenResponse loginUser(LoginRequest loginRequest, HttpServletResponse response) {
         User user = userRepository.findByEmail(loginRequest.email()).orElseThrow(() ->
-                new BadCredentialsException("Invalid Email"));
+                new BadCredentialsException("User Not Found Please Sign Up"));
 
         if (user.getProvider() == Provider.GOOGLE){
             throw new BadCredentialsException("You can't access this you used Google Previously Please use that for security purpose");
@@ -95,6 +105,57 @@ public class AuthServiceImpl implements AuthService {
         cookieService.addNoStoreHeaders(response);
         return TokenResponse.of(newAccessToken, newRefreshToken,
                 jwtService.getAccessTokenValiditySeconds(), modelMapper.map(user, UserDTO.class));
+    }
+
+    @Override
+    public ResponseEntity<String> verifyEmailAndSendOtp(String email) {
+        User user = emailService.verifyEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Email Id");
+        }
+        Long otp = otpGenerator();
+        emailService.sendOtpEmail(email,otp);
+        ForgetPassword fp = ForgetPassword.builder()
+                .otp(otp)
+                .expiryDate(new Date(System.currentTimeMillis() + otpValidationTime))
+                .user(user)
+                .build();
+
+        forgetPasswordRepository.save(fp);
+        return ResponseEntity.ok("Email Sent for Verification");
+    }
+
+    @Override
+    public ResponseEntity<String> verifyOtp(String email, String otp) {
+        User user = userRepository.findByEmail(email).orElseThrow(() ->  new BadCredentialsException("User Not Found"));
+
+        ForgetPassword fp = forgetPasswordRepository.findByOtpAndUser(Long.parseLong(otp),user).orElseThrow(() -> new RuntimeException("Invalid otp"));
+
+        if (fp.getExpiryDate().before(Date.from(Instant.now()))) {
+            forgetPasswordRepository.deleteById(fp.getId());
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body("OTP Expired Resend OTP");
+        }
+
+        System.out.println("Current time: " + new Date());
+        System.out.println("OTP expiry: " + fp.getExpiryDate());
+
+        fp.setVerified(true);
+        forgetPasswordRepository.save(fp);
+        return ResponseEntity.ok("OTP Verified!");
+    }
+
+    @Override
+    public ResponseEntity<String> resetPassword(String email, String rewrittenPassword, String password) {
+        if (!rewrittenPassword.equals(password)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords do not match");
+        }
+        User user = userRepository.findByEmail(email).orElseThrow(() ->  new BadCredentialsException("User not found"));
+        ForgetPassword fp = forgetPasswordRepository.findByUserAndVerifiedTrue(user)
+                        .orElseThrow(() -> new BadCredentialsException("OTP verification required"));
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+        forgetPasswordRepository.delete(fp);
+        return ResponseEntity.ok("Password Updated Successfully");
     }
 
     @Override
@@ -152,5 +213,11 @@ public class AuthServiceImpl implements AuthService {
             }
         }
         return Optional.empty();
+    }
+
+
+    private Long otpGenerator(){
+        Random random = new Random();
+        return random.nextLong(100000,999999);
     }
 }

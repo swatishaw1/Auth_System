@@ -48,14 +48,10 @@ export default function LoginPage() {
       const userInfo = await login(loginData);
       console.log(userInfo);
       toast.success("User Logged In Successfully");
-      setLoginData({
-        email: "",
-        password: ""
-      });
+      setLoginData({email: "",password: ""});
       navigate("/dashboard");
     } catch (error: any) {
         console.error(error);
-
         if (error.response?.data?.message) {
             setError(error.response.data.message);
         } else {
@@ -95,6 +91,11 @@ export default function LoginPage() {
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" placeholder="Enter your password" name="password" value={loginData.password} onChange={onHandleLoginInputChange} />
+            </div>
+
+            <div className="flex justify-end">
+              <button type="button" className="text-sm text-muted-foreground hover:text-foreground hover:underline" 
+              onClick={() => navigate("/forgot-password")}>Forgot Password?</button>
             </div>
 
             <Button className="w-full cursor-pointer"> {loading?<> <Spinner/> Please Wait...</>:"Login"}</Button>

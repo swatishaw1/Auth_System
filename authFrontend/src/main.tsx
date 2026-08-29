@@ -13,6 +13,7 @@ import UserProfile from './pages/users/UserProfile.tsx';
 import UserLayout from './pages/users/UserLayout.tsx';
 import OAuthSuccess from './pages/OAuthSuccess.tsx';
 import OAuthFailure from './pages/OAuthFailure.tsx';
+import ForgotPassword from './pages/ForgotPassword.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -22,10 +23,12 @@ createRoot(document.getElementById('root')!).render(
         <Route index element={<App />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/about" element={<About />} />
         <Route path="/services" element={<Services />} />
         <Route element={<UserLayout />}>
           <Route path="dashboard" element={<UserDashboard />} />
+          <Route path="profile" element={<UserProfile />} />
           <Route path="dashboard/profile" element={<UserProfile />} />
         </Route>
         <Route path="/oauth/success" element={<OAuthSuccess />} />

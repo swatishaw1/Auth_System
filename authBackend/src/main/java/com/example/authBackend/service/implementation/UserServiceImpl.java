@@ -5,6 +5,7 @@ import com.example.authBackend.exceptions.ResourceNotFoundException;
 import com.example.authBackend.helper.UserHelper;
 import com.example.authBackend.model.User;
 import com.example.authBackend.api.response.UserResponse;
+import com.example.authBackend.repository.ForgetPasswordRepository;
 import com.example.authBackend.repository.RefreshTokenRepository;
 import com.example.authBackend.repository.UserRepository;
 import com.example.authBackend.service.UserService;
@@ -18,7 +19,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +41,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final ForgetPasswordRepository forgetPasswordRepository;
 
     @Override
     @Transactional
@@ -55,7 +66,6 @@ public class UserServiceImpl implements UserService {
         if(userDTO.getName()!=null){ savedUser.setName(userDTO.getName());}
         if (userDTO.getEmail()!=null) savedUser.setEmail(userDTO.getEmail());
         if (userDTO.getPassword()!=null) savedUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        if (userDTO.getImage()!=null) savedUser.setImage(userDTO.getImage());
         savedUser.setUpdatedAt(Instant.now());
         savedUser.setEnable(true);
         User savedUser1 = userRepository.save(savedUser);
@@ -64,16 +74,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(()-> new ResourceNotFoundException("Email not found"));;
-        return modelMapper.map(user,UserDTO.class);
-    }
-
-    @Override
-    public UserDTO getUserByID(String userId) {
-        UUID uId = UserHelper.parseUUID(userId);
-        User user = userRepository.findById(uId)
-                .orElseThrow(()-> new ResourceNotFoundException("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(()-> new ResourceNotFoundException("Email not found"));;
         return modelMapper.map(user,UserDTO.class);
     }
 
@@ -81,8 +82,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(String userId) {
         UUID uId = UserHelper.parseUUID(userId);
-        User user = userRepository.findById(uId).orElseThrow(() ->
-                new ResourceNotFoundException("User not found"));
+        User user = userRepository.findById(uId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        forgetPasswordRepository.deleteByUser(user);
         refreshTokenRepository.deleteByUser(user);
         userRepository.delete(user);
     }
@@ -106,4 +107,5 @@ public class UserServiceImpl implements UserService {
         userResponse.setLastPage(pageUser.isLast());
         return userResponse;
     }
+
 }

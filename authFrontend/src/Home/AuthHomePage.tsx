@@ -2,8 +2,16 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { features, securityPoints } from "../constants/landing";
+import { useNavigate } from "react-router";
 
 export default function AuthHomePage() {
+    const navigate = useNavigate();
+    const handleLearnMore = () => {
+        document.getElementById("features")?.scrollIntoView({
+            behavior: "smooth",
+        });
+    };
+
     return (
         <main className="min-h-screen overflow-hidden bg-background text-foreground">
             {/* Background Effects */}
@@ -19,32 +27,29 @@ export default function AuthHomePage() {
                     <h1 className="text-5xl font-black leading-tight tracking-tight md:text-7xl"> Secure Access
                         <span className="block bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent"> For Modern Apps </span>
                     </h1>
-                    <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">A scalable multi-tenant authentication system built using React.js, TypeScript, Spring Boot, JWT, OAuth2 for secure microservice architecture.
+                    <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">A secure authentication system built using React.js, TypeScript, Spring Boot, JWT, and OAuth2 for modern web applications.
                     </p>
                     <div className="mt-10 flex flex-wrap justify-center gap-4">
-                        <Button size="lg" className="bg-foreground font-semibold text-background hover:bg-foreground/90" >
+                        <Button size="lg" className="bg-foreground font-semibold text-background hover:bg-foreground/90" onClick={() => navigate("/login")}>
                             Get Started<ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
-                        <Button variant="outline" size="lg">Learn More</Button>
+                        <Button variant="outline" size="lg" onClick={handleLearnMore}>Learn More</Button>
                     </div>
                     <div className="mt-10 flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-foreground" /> Secure JWT Flow </div>
                         <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-foreground" /> OAuth2 Integration </div>
-                        <div className="flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-foreground" /> Multi-Tenant Support </div>
                     </div>
                 </div>
             </section>
 
             {/* Features */}
-            <section className="border-t border-border px-6 py-24">
+            <section id="features" className="border-t border-border px-6 py-24">
                 <div className="mx-auto max-w-7xl">
                     <div className="mx-auto flex flex-col items-center text-center">
                         <h2 className="text-4xl font-black md:text-5xl">Built For Modern Authentication</h2>
-                        <p className="mt-4 text-lg text-muted-foreground">Designed with scalability, security and performance
-                            focused architecture principles.</p>
+                        <p className="mt-4 text-lg text-muted-foreground">Designed with scalability, security and performance focused architecture principles.</p>
                     </div>
                     <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {features.map((feature) => {
@@ -53,7 +58,6 @@ export default function AuthHomePage() {
                                 <Card key={feature.title} className="group border-border bg-card transition-all duration-300 hover:border-muted-foreground/20" >
                                     <CardContent className="p-8">
                                         <div className="mb-5 inline-flex rounded-2xl bg-muted p-4 text-foreground"> <Icon className="h-7 w-7" /> </div>
-
                                         <h3 className="text-2xl font-bold"> {feature.title} </h3>
                                         <p className="mt-4 leading-relaxed text-muted-foreground"> {feature.description} </p>
                                     </CardContent>
@@ -68,9 +72,7 @@ export default function AuthHomePage() {
             <section className="border-t border-border px-6 py-24">
                 <div className="mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-2">
                     <div>
-                        <h2 className="text-4xl font-black md:text-5xl">
-                            System Architecture
-                        </h2>
+                        <h2 className="text-4xl font-black md:text-5xl"> System Architecture</h2>
                         <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
                             The application follows a scalable architecture
                             using React.js frontend, Spring Boot backend APIs
@@ -97,7 +99,7 @@ export default function AuthHomePage() {
                             </div>
                             <div className="rounded-2xl border border-border/70 bg-background p-5 shadow-sm">
                                 <h3 className="font-semibold"> API Gateway </h3>
-                                <p className="mt-2 text-sm text-muted-foreground"> Authentication Middleware + Rate Limiting </p>
+                                <p className="mt-2 text-sm text-muted-foreground"> Authentication Middleware</p>
                             </div>
                             <div className="flex justify-center">
                                 <div className="h-10 w-px bg-muted-foreground/40" />
@@ -111,7 +113,7 @@ export default function AuthHomePage() {
                             </div>
                             <div className="rounded-2xl border border-border/70 bg-background p-5 shadow-sm">
                                 <h3 className="font-semibold"> Database Layer </h3>
-                                <p className="mt-2 text-sm text-muted-foreground"> MySQL + Multi-Tenant Isolation </p>
+                                <p className="mt-2 text-sm text-muted-foreground"> MySQL</p>
                             </div>
                         </div>
                     </div>
@@ -129,10 +131,10 @@ export default function AuthHomePage() {
                         modern security standards and scalable architecture.
                     </p>
                     <div className="mt-10 flex flex-wrap justify-center gap-4">
-                        <Button size="lg" className="bg-foreground font-semibold text-background hover:bg-foreground/90" >
+                        <Button size="lg" className="bg-foreground font-semibold text-background hover:bg-foreground/90" onClick={() => navigate("/login")}>
                             Get Started
                         </Button>
-                        <Button variant="outline" size="lg"> Learn More </Button>
+                        <Button variant="outline" size="lg" onClick={handleLearnMore}> Learn More </Button>
                     </div>
                 </div>
             </section>

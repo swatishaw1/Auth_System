@@ -2,6 +2,15 @@ import useAuth from '@/auth/store';
 import { refreshToken } from '@/services/AuthService';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+
+const publicEndpoints = [
+  "/auth/login",
+  "/auth/register",
+  "/auth/verifyEmail",
+  "/auth/verifyOtp",
+  "/auth/resetPassword",
+];
+
 const ApiClient = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_BACKEND_URL || "http://localhost:8080/api/v1",
     headers: {
@@ -13,10 +22,16 @@ const ApiClient = axios.create({
 
 //Every Request:Before
 ApiClient.interceptors.request.use((config) => {
-  const accessToken = useAuth.getState().accessToken;
+  const isPublicEndpoint = publicEndpoints.some((endpoint) =>
+    config.url?.endsWith(endpoint)
+  );
 
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
+  if (!isPublicEndpoint) {
+    const accessToken = useAuth.getState().accessToken;
+
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
   }
 
   return config;
@@ -42,9 +57,13 @@ ApiClient.interceptors.response.use(
   async (error) => {
     const is401 = error.response.status === 401;
     const original = error.config;
+
+    const isPublicEndpoint = publicEndpoints.some((endpoint) => original?.url?.endsWith(endpoint));
     console.log(original);
     console.log("original retry: ", original._retry);
-    if (!is401 || original._retry) {
+    console.log("URL:", original?.url);
+    console.log("Is Public:", isPublicEndpoint);
+    if (!is401 || original._retry || isPublicEndpoint) {
       //message:
 
       if (error.response && error.response.data)

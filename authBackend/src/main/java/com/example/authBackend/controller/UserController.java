@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -21,8 +22,7 @@ public class UserController {
             @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
             @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
             @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_USER_RECORDS_BY, required = false) String sortBy,
-            @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder
-    ){
+            @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder){
         return ResponseEntity.ok(userService.getAllUsers(pageNumber,pageSize,sortBy,sortOrder));
     }
 
@@ -35,21 +35,15 @@ public class UserController {
     public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userDTO,@PathVariable String userId){
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.updateUser(userDTO,userId));
     }
+
     @DeleteMapping("/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable String userId){
         userService.deleteUser(userId);
         return ResponseEntity.ok("User Deleted Successfully");
     }
 
-    @GetMapping("/byId/{userId}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable String userId){
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.getUserByID(userId));
-    }
-
     @GetMapping("/byEmail/{email}")
     public ResponseEntity<UserDTO> getUserByEmail(@PathVariable String email){
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.getUserByEmail(email));
     }
-
-
 }

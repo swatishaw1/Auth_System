@@ -30,6 +30,20 @@ spring:
                 scope:
                     - read:user
                     - user:email
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  otp:
+    validation:
+      time: ${OTP_VALIDATION_TIME}
 
 app:
   cors:

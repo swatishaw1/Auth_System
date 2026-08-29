@@ -57,6 +57,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<ForgetPassword> forgetPasswords = new ArrayList<>();
+
 
     @PrePersist
     protected void onCreate() {
