@@ -1,4 +1,4 @@
-# Multi-Provider Authentication & Authorization System
+# Authentication & Authorization System
 
 A production-oriented authentication and authorization backend built with **Spring Boot 4**, **Spring Security**, **JWT**, **OAuth2**, and **MySQL**.
 
