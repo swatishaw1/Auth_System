@@ -106,7 +106,7 @@ export default function AuthHomePage() {
                             </div>
                             <div className="rounded-2xl border border-border/70 bg-background p-5 shadow-sm">
                                 <h3 className="font-semibold"> Backend Services </h3>
-                                <p className="mt-2 text-sm text-muted-foreground"> Spring Boot Microservices + JWT </p>
+                                <p className="mt-2 text-sm text-muted-foreground"> Spring Boot + JWT </p>
                             </div>
                             <div className="flex justify-center">
                                 <div className="h-10 w-px bg-muted-foreground/40" />
