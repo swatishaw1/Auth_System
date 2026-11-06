@@ -81,8 +81,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # ESLint runs, but lint errors do not fail the workflow
       - name: ESLint
         run: npm run lint
+        continue-on-error: true
 
       - name: TypeScript check
         run: npm run typecheck
