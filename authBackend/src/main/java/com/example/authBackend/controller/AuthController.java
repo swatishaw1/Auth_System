@@ -3,6 +3,7 @@ import com.example.authBackend.api.request.*;
 import com.example.authBackend.api.response.TokenResponse;
 import com.example.authBackend.dto.UserDTO;
 import com.example.authBackend.service.AuthService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @RateLimiter(name = "loginLimiter")
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> loginUser(@RequestBody LoginRequest loginRequest, HttpServletResponse response){
         return ResponseEntity.status(HttpStatus.OK).body(authService.loginUser(loginRequest,response));
@@ -32,30 +34,35 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
+    @RateLimiter(name = "refreshLimiter")
     public ResponseEntity<TokenResponse> refreshToken(@RequestBody(required = false) RefreshTokenRequest body,
                                                       HttpServletResponse response, HttpServletRequest request){
         return ResponseEntity.status(HttpStatus.OK).body(authService.refreshToken(body,request,response));
     }
 
     @PostMapping("/register")
+    @RateLimiter(name = "registerLimiter")
     public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO){
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.registerUser(userDTO));
     }
 
     // Verify Email & Send OTP
     @PostMapping("/verifyEmail")
+    @RateLimiter(name = "forgotPasswordLimiter")
     public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequest request) {
         return authService.verifyEmailAndSendOtp(request.email());
     }
 
     // Verify OTP
     @PostMapping("/verifyOtp")
+    @RateLimiter(name = "otpVerifyLimiter")
     public ResponseEntity<String> verifyOtp(@RequestBody VerifyOtpRequest request) {
         return authService.verifyOtp(request.email(),request.otp());
     }
 
 
     // Reset Password
+    @RateLimiter(name = "resetPasswordLimiter")
     @PostMapping("/resetPassword")
     public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
         return authService.resetPassword( request.email(),request.rewrittenPassword(),request.password());

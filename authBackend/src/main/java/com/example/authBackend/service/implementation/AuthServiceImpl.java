@@ -14,6 +14,7 @@ import com.example.authBackend.repository.UserRepository;
 import com.example.authBackend.security.CookieService;
 import com.example.authBackend.service.*;
 import com.example.authBackend.utils.JwtService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

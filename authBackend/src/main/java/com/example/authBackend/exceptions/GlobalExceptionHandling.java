@@ -3,6 +3,7 @@ package com.example.authBackend.exceptions;
 
 import com.example.authBackend.api.response.ApiErrorResponse;
 import com.example.authBackend.api.response.ErrorResponse;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,8 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandling {
@@ -42,6 +45,21 @@ public class GlobalExceptionHandling {
     public ResponseEntity<ErrorResponse> handleIllegalAccessException(IllegalArgumentException exception){
         ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(), HttpStatus.BAD_REQUEST);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+
+    @ExceptionHandler(RequestNotPermitted.class)
+    public ResponseEntity<Map<String, String>> handleRateLimit(
+            RequestNotPermitted exception) {
+
+        Map<String, String> response = Map.of(
+                "error", "TOO_MANY_REQUESTS",
+                "message", "Too many requests. Please try again later."
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(response);
     }
 
 
