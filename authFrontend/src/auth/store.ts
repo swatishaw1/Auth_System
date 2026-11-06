@@ -56,7 +56,7 @@ const useAuth = create<AuthState>()(
           set({ authLoading: false });
         }
       },
-      logout: async (silent = false) => {
+      logout: async () => {
         try {
           //   if (!silent) {
           //     await logoutUser();

@@ -27,9 +27,9 @@ public class GlobalExceptionHandling {
             DisabledException.class
     })
     public ResponseEntity<ApiErrorResponse> handleException(Exception e, HttpServletRequest request) {
-        ApiErrorResponse apiResponse = ApiErrorResponse.of(HttpStatus.BAD_REQUEST.value(),"BAD_REQUEST",e.getMessage(),request.getRequestURI());
+        ApiErrorResponse apiResponse = ApiErrorResponse.of(HttpStatus.UNAUTHORIZED.value(),"UNAUTHORIZED",e.getMessage(),request.getRequestURI());
         logger.error("Exception: {}",e.getClass().getName());
-        return new ResponseEntity<>(apiResponse,HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiResponse,HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -43,4 +43,6 @@ public class GlobalExceptionHandling {
         ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(), HttpStatus.BAD_REQUEST);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
+
+
 }

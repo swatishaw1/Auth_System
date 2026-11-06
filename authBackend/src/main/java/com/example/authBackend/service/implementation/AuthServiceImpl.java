@@ -136,8 +136,8 @@ public class AuthServiceImpl implements AuthService {
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body("OTP Expired Resend OTP");
         }
 
-        System.out.println("Current time: " + new Date());
-        System.out.println("OTP expiry: " + fp.getExpiryDate());
+//        System.out.println("Current time: " + new Date());
+//        System.out.println("OTP expiry: " + fp.getExpiryDate());
 
         fp.setVerified(true);
         forgetPasswordRepository.save(fp);
