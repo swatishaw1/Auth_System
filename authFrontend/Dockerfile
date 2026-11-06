@@ -1,4 +1,3 @@
-
 # Stage 1: Build React application
 FROM node:22-alpine AS build
 
@@ -7,7 +6,7 @@ WORKDIR /app
 # Copy dependency files
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies (production + dev for build)
 RUN npm ci
 
 # Copy source code
