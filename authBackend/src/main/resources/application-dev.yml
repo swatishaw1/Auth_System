@@ -70,3 +70,44 @@ security:
 logging:
   level:
     org.springframework.security: TRACE
+
+
+
+resilience4j:
+  ratelimiter:
+    instances:
+      loginLimiter:
+        limitForPeriod: 5
+        limitRefreshPeriod: 1m
+        timeoutDuration: 0
+
+      registerLimiter:
+        limitForPeriod: 3
+        limitRefreshPeriod: 1h
+        timeoutDuration: 0
+
+      otpSendLimiter:
+        limitForPeriod: 3
+        limitRefreshPeriod: 10m
+        timeoutDuration: 0
+
+      otpVerifyLimiter:
+        limitForPeriod: 5
+        limitRefreshPeriod: 5m
+        timeoutDuration: 0
+
+      forgotPasswordLimiter:
+        limitForPeriod: 3
+        limitRefreshPeriod: 15m
+        timeoutDuration: 0
+
+      resetPasswordLimiter:
+        limitForPeriod: 5
+        limitRefreshPeriod: 15m
+        timeoutDuration: 0
+
+      refreshLimiter:
+        limitForPeriod: 10
+        limitRefreshPeriod: 1m
+        timeoutDuration: 0
+

@@ -4,6 +4,7 @@ import com.example.authBackend.configuration.AppConstants;
 import com.example.authBackend.dto.UserDTO;
 import com.example.authBackend.api.response.UserResponse;
 import com.example.authBackend.service.UserService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ public class UserController {
     }
 
     @PostMapping
+    @RateLimiter(name = "registerLimiter")
     public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO){
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userDTO));
     }
