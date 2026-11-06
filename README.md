@@ -1,415 +1,207 @@
-# Authentication & Authorization System
+# Full Stack Authentication & Authorization System
 
-A production-oriented authentication and authorization backend built with **Spring Boot 4**, **Spring Security**, **JWT**, **OAuth2**, and **MySQL**.
+A full-stack authentication application built to explore practical
+backend security, token management, OAuth2, rate limiting, automated
+testing, CI, and containerization.
 
-The system supports traditional email/password authentication as well as **Google and GitHub OAuth2 login**, with secure access-token and refresh-token handling, refresh-token rotation, role-based authorization, OTP-based password recovery, email verification, pagination, validation, and centralized exception handling.
+**Backend:** Java 21, Spring Boot 4.0.5, Spring Security\
+**Frontend:** React, TypeScript, Vite\
+**Database:** MySQL 8.4\
+**Repository:** https://github.com/swatishaw1/Auth_System
 
----
+------------------------------------------------------------------------
 
 ## Features
 
-### Authentication
+### Authentication and session management
 
-* User registration
-* Email/password login
-* JWT access-token authentication
-* JWT refresh-token mechanism
-* Refresh-token rotation
-* Secure logout with token revocation
-* Access and refresh tokens stored using cookies
-* HttpOnly cookie support
-* Configurable cookie security settings
+-   Email/password registration and login.
+-   JWT access and refresh tokens.
+-   Refresh-token rotation and server-side revocation.
+-   Logout with refresh-token revocation and cookie clearing.
+-   Secure HttpOnly cookie-based token handling.
+-   Configurable cookie properties: `Secure`, `HttpOnly`, `SameSite`,
+    and domain.
 
-### OAuth2 Login
+### OAuth2
 
-* Google OAuth2 authentication
-* GitHub OAuth2 authentication
-* Custom OAuth2 user information handling
-* Provider-aware authentication
-* OAuth2 success and failure handlers
-* Automatic user creation/update for OAuth2 users
+-   Google and GitHub login.
+-   Custom OAuth2 user-information handling.
+-   Provider-aware user creation and updates.
+-   OAuth2 success and failure handlers.
 
-### Password Recovery
+### Password recovery
 
-* Email-based password recovery
-* OTP generation
-* OTP delivery through email
-* OTP expiration
-* OTP verification
-* Password reset after successful OTP verification
+-   Email-based OTP generation and delivery.
+-   OTP expiry and verification.
+-   Password reset after successful verification.
+-   BCrypt password hashing.
 
-### Authorization and Security
+### Authorization and user management
 
-* Spring Security
-* Role-based authorization
-* JWT request filtering
-* Secure password hashing using BCrypt
-* Disabled-account protection
-* Refresh-token revocation
-* Refresh-token rotation
-* Stateless authentication
+-   Role-based authorization (`USER`, `ADMIN`).
+-   JWT request filter and stateless Spring Security configuration.
+-   User create, read, update, and delete operations.
+-   Pagination and sorting.
+-   DTO-based request and response models.
 
-### User Management
+### Backend reliability and protection
 
-* Create users
-* Retrieve users
-* Retrieve users by email
-* Update users
-* Delete users
-* Pagination
-* Sorting
-* DTO-based API responses
+-   Resilience4j rate limiting for sensitive authentication operations.
+-   Request validation with Jakarta Bean Validation.
+-   Centralized exception handling and structured API errors.
+-   Service-layer business logic and Spring Data JPA repository
+    abstraction.
+-   Swagger/OpenAPI documentation.
 
-### API and Backend Quality
+### Testing and engineering workflow
 
-* RESTful APIs
-* Jakarta Bean Validation
-* Global exception handling
-* Structured API error responses
-* DTO layer to prevent direct entity exposure
-* Service-layer business logic
-* Repository abstraction using Spring Data JPA
-* Swagger/OpenAPI documentation
-* MySQL persistence
+-   JUnit 5 and Mockito-based backend testing.
+-   Rate-limiter integration testing through Spring-managed beans and
+    AOP proxies.
+-   GitHub Actions workflow for backend tests, frontend checks, MySQL
+    smoke tests, and Docker image builds.
+-   Dockerfiles for backend and frontend.
+-   Docker Compose setup for the application and MySQL.
 
----
+> **Rate-limiter note:** Resilience4j rate limiters are in-memory and
+> apply per limiter instance in a running application process. They are
+> not distributed, per-IP, or per-user limits. Multiple backend
+> instances need a shared/distributed solution for coordinated limits.
+
+------------------------------------------------------------------------
 
 ## Tech Stack
 
-| Technology         | Purpose                          |
-| ------------------ | -------------------------------- |
-| Java 21            | Programming language             |
-| Spring Boot 4.0.5  | Backend framework                |
-| Spring Security    | Authentication and authorization |
-| Spring Data JPA    | Database access                  |
-| Hibernate          | ORM                              |
-| MySQL              | Relational database              |
-| JJWT 0.13.0        | JWT creation and validation      |
-| OAuth2 Client      | Google and GitHub authentication |
-| Spring Mail        | OTP and password recovery emails |
-| Jakarta Validation | Request validation               |
-| ModelMapper        | DTO and entity mapping           |
-| Lombok             | Boilerplate reduction            |
-| SpringDoc OpenAPI  | API documentation                |
-| Maven              | Build and dependency management  |
-
----
+| Category | Technology | Purpose |
+|---|---|---|
+| **Backend** | Java 21, Spring Boot 4.0.5 | Backend development |
+| **Security** | Spring Security, JWT 0.13.0, OAuth2 | Authentication and authorization |
+| **Database** | MySQL 8.4, Spring Data JPA, Hibernate | Data storage and ORM |
+| **Email** | Spring Mail | OTP and recovery emails |
+| **Rate Limiting** | Resilience4j | API rate limiting |
+| **Testing** | JUnit 5, Mockito | Backend unit and integration testing |
+| **Frontend** | React, TypeScript, Vite | User interface |
+| **HTTP Client** | Axios | Frontend API requests |
+| **Web Server** | Nginx | Static hosting and reverse proxy |
+| **Containerization** | Docker, Docker Compose | Containerization and local orchestration |
+| **CI/CD** | GitHub Actions | Automated testing and CI |
+| **API Documentation** | SpringDoc OpenAPI | API documentation |
+| **Build Tools** | Maven, npm | Dependency and build management |
+------------------------------------------------------------------------
 
 ## Architecture
 
-The project follows a layered backend architecture:
+### Backend request flow
 
-```text
+``` text
 Client
-   |
-   v
-REST Controllers
-   |
-   v
+  |
+  v
+REST Controller
+  |
+  v
 Service Layer
-   |
-   v
+  |
+  v
 Repository Layer
-   |
-   v
-MySQL Database
-```
-
-Security-related requests additionally pass through the JWT authentication filter:
-
-```text
-HTTP Request
-     |
-     v
-JwtAuthenticationFilter
-     |
-     v
-JWT Validation
-     |
-     v
-Spring Security Context
-     |
-     v
-Controller
-```
-
----
-
-## Project Structure
-
-```text
-authBackend/
-|
-├── src/
-│   ├── main/
-│   │   ├── java/com/example/authBackend/
-│   │   │
-│   │   ├── Enum/
-│   │   │   ├── Provider.java
-│   │   │   └── Role.java
-│   │   │
-│   │   ├── api/
-│   │   │   ├── MailBody.java
-│   │   │   ├── request/
-│   │   │   │   ├── ForgotPasswordRequest.java
-│   │   │   │   ├── LoginRequest.java
-│   │   │   │   ├── RefreshTokenRequest.java
-│   │   │   │   ├── ResetPasswordRequest.java
-│   │   │   │   └── VerifyOtpRequest.java
-│   │   │   │
-│   │   │   └── response/
-│   │   │       ├── ApiErrorResponse.java
-│   │   │       ├── ErrorResponse.java
-│   │   │       ├── TokenResponse.java
-│   │   │       └── UserResponse.java
-│   │   │
-│   │   ├── configuration/
-│   │   │   ├── ApiDocConfig.java
-│   │   │   ├── AppConfig.java
-│   │   │   ├── AppConstants.java
-│   │   │   └── SecurityConfig.java
-│   │   │
-│   │   ├── controller/
-│   │   │   ├── AuthController.java
-│   │   │   └── UserController.java
-│   │   │
-│   │   ├── dto/
-│   │   │   ├── RoleDTO.java
-│   │   │   └── UserDTO.java
-│   │   │
-│   │   ├── exceptions/
-│   │   │   ├── GlobalExceptionHandling.java
-│   │   │   └── ResourceNotFoundException.java
-│   │   │
-│   │   ├── filter/
-│   │   │   └── JwtAuthenticationFilter.java
-│   │   │
-│   │   ├── helper/
-│   │   │   └── UserHelper.java
-│   │   │
-│   │   ├── model/
-│   │   │   ├── ForgetPassword.java
-│   │   │   ├── RefreshToken.java
-│   │   │   └── User.java
-│   │   │
-│   │   ├── repository/
-│   │   │   ├── ForgetPasswordRepository.java
-│   │   │   ├── RefreshTokenRepository.java
-│   │   │   └── UserRepository.java
-│   │   │
-│   │   ├── security/
-│   │   │   ├── CookieService.java
-│   │   │   └── oauth2/
-│   │   │       ├── OAuth2SuccessHandler.java
-│   │   │       ├── Oauth2FailureHandler.java
-│   │   │       └── userInfo/
-│   │   │           ├── CustomOAuth2UserService.java
-│   │   │           ├── CustomeUserDetailsService.java
-│   │   │           ├── GitHubOAuth2UserInfo.java
-│   │   │           ├── GoogleOAuth2UserInfo.java
-│   │   │           ├── OAuth2UserInfo.java
-│   │   │           └── Oauth2UserInfoFactory.java
-│   │   │
-│   │   ├── service/
-│   │   │   ├── AuthService.java
-│   │   │   ├── AuthenticationService.java
-│   │   │   ├── EmailService.java
-│   │   │   ├── RefreshTokenService.java
-│   │   │   ├── UserService.java
-│   │   │   └── implementation/
-│   │   │       ├── AuthServiceImpl.java
-│   │   │       ├── AuthenticationServiceImpl.java
-│   │   │       ├── EmailServiceImpl.java
-│   │   │       ├── RefreshTokenServiceImpl.java
-│   │   │       └── UserServiceImpl.java
-│   │   │
-│   │   └── utils/
-│   │       └── JwtService.java
-│   │
-│   └── resources/
-│       ├── application.yaml
-│       └── application-dev.yml
-│
-├── Auth System.postman_collection.json
-├── pom.xml
-├── mvnw
-└── mvnw.cmd
-```
-
----
-
-## Authentication Flow
-
-### Local Registration
-
-```text
-Client
-  |
-  | POST /api/v1/auth/register
-  v
-AuthController
-  |
-  v
-AuthService
-  |
-  v
-UserService
-  |
-  v
-UserRepository
   |
   v
 MySQL
 ```
 
-The user's password is encoded using **BCrypt** before being stored.
+For protected requests, Spring Security processes the request through
+the JWT authentication filter before the controller is reached.
 
-### Login
-
-```text
-User
- |
- | Email + Password
- v
-POST /api/v1/auth/login
- |
- v
-AuthenticationService
- |
- v
-Spring Security
- |
- v
-Password Verification
- |
- v
-JWT Access Token
-+
-JWT Refresh Token
- |
- v
-Secure Cookies
+``` text
+HTTP Request
+  |
+  v
+Spring Security Filter Chain
+  |
+  v
+JwtAuthenticationFilter
+  |
+  v
+JWT Validation
+  |
+  v
+Security Context
+  |
+  v
+Controller
 ```
 
-The system generates:
+### Docker request flow
 
-* Access token
-* Refresh token
-* Unique refresh-token identifier (`jti`)
-
-The refresh token is stored and tracked server-side so that it can later be revoked or rotated.
-
----
-
-## Refresh Token Rotation
-
-When the access token expires, the client can request a new token pair.
-
-```text
-Old Refresh Token
-       |
-       v
-Validate Token
-       |
-       v
-Generate New JTI
-       |
-       v
-Generate New Access Token
-       +
-Generate New Refresh Token
-       |
-       v
-Revoke/Replace Old Token
-       |
-       v
-Return New Token Pair
+``` text
+Browser
+  |
+  v
+Frontend (Nginx)
+  |
+  | /api, /oauth2, /login/oauth2
+  v
+Spring Boot Backend
+  |
+  v
+MySQL
 ```
 
-Refresh-token rotation reduces the security risk associated with long-lived refresh tokens.
+Nginx serves the frontend and proxies API and OAuth2 routes to the
+backend container.
 
----
+------------------------------------------------------------------------
 
-## Logout
+## Key implementation concepts
 
-Logout performs more than simply deleting a client-side token.
+### 1. Access and refresh tokens
 
-```text
-Logout Request
-      |
-      v
-Read Refresh Token
-      |
-      v
-Validate JWT
-      |
-      v
-Extract JTI
-      |
-      v
-Revoke Refresh Token
-      |
-      v
-Clear Authentication Cookies
-      |
-      v
-Clear Security Context
+The application uses separate JWTs for access and refresh operations.
+
+-   **Access token:** Authenticates requests to protected APIs and has a
+    shorter lifetime.
+-   **Refresh token:** Obtains a new access/refresh token pair.
+-   **JTI:** A unique token identifier used to track refresh-token
+    records.
+
+The refresh token is tracked server-side, allowing the application to
+revoke or replace it.
+
+### 2. Refresh-token rotation
+
+``` text
+Client sends current refresh token
+            |
+            v
+Validate token and server-side record
+            |
+            v
+Generate new access and refresh tokens
+            |
+            v
+Revoke/replace old refresh token
+            |
+            v
+Return new token pair in cookies
 ```
 
----
+Rotation limits the usefulness of a refresh token after it has been
+used. Server-side tracking makes revocation possible.
 
-## Password Reset Flow
+### 3. Logout and revocation
 
-The password recovery process uses email OTP verification.
+Logout is not limited to deleting browser cookies:
 
-```text
-1. User submits email
-          |
-          v
-2. Email is verified
-          |
-          v
-3. OTP generated
-          |
-          v
-4. OTP sent through email
-          |
-          v
-5. User submits OTP
-          |
-          v
-6. OTP validated and expiration checked
-          |
-          v
-7. User submits new password
-          |
-          v
-8. Password is BCrypt encoded
-          |
-          v
-9. Password updated
-```
+1.  Read and validate the refresh token.
+2.  Extract its JTI.
+3.  Revoke the corresponding server-side token record.
+4.  Clear authentication cookies.
+5.  Clear the security context.
 
-### Password Recovery Endpoints
+### 4. OAuth2 login
 
-```text
-POST /api/v1/auth/verifyEmail
-POST /api/v1/auth/verifyOtp
-POST /api/v1/auth/resetPassword
-```
-
----
-
-## OAuth2 Authentication
-
-The application supports:
-
-* Google
-* GitHub
-
-OAuth2 users are handled through custom provider-specific classes.
-
-```text
+``` text
 User
  |
  v
@@ -422,192 +214,181 @@ OAuth2 Callback
 CustomOAuth2UserService
  |
  v
-Provider-specific UserInfo
+Provider-specific user information
  |
  v
-User Creation / Update
+Create or update application user
  |
  v
-OAuth2 Success Handler
+OAuth2 success handler
  |
  v
 Application
 ```
 
-Provider information is represented using an enum:
+The application distinguishes `LOCAL`, `GOOGLE`, and `GITHUB` providers.
 
-```java
-Provider.LOCAL
-Provider.GOOGLE
-Provider.GITHUB
+### 5. OTP password recovery
+
+``` text
+Submit email
+    |
+    v
+Generate and email OTP
+    |
+    v
+Submit OTP
+    |
+    v
+Validate OTP and expiry
+    |
+    v
+Submit new password
+    |
+    v
+BCrypt hash and update password
 ```
 
-This separates authentication behavior based on the user's authentication provider.
+### 6. Resilience4j rate limiting
 
----
+Rate limiting controls how many calls a named operation can accept
+during a configured time period.
 
-## User Roles
+The application configures named limiters for sensitive operations,
+including login, registration, OTP, password recovery, and refresh-token
+operations.
 
-The application supports role-based authorization.
+With annotation-based integration, a Spring-managed method is
+intercepted through AOP. When the limit is exceeded, Resilience4j
+rejects the call with `RequestNotPermitted`; the API should translate
+that into HTTP `429 Too Many Requests`.
 
-Roles are represented using an enum and included in the authenticated user's security authorities.
+These are application-level limits, not user-specific quotas.
 
-Example:
+### 7. Testing
 
-```text
-USER
-ADMIN
+-   **Unit tests:** Test individual classes or methods, using Mockito to
+    isolate dependencies where appropriate.
+-   **Integration tests:** Start the Spring application context and test
+    interactions between Spring-managed components.
+-   **Rate-limiter tests:** Verify that requests within the configured
+    limit are accepted and the next request is rejected.
+
+Rate-limiter annotations rely on Spring AOP. Tests should call the
+Spring-managed bean through its proxy; directly constructing the
+annotated class bypasses the proxy and does not test annotation
+integration.
+
+------------------------------------------------------------------------
+
+## Project structure
+
+The backend follows a layered structure. Main packages include:
+
+``` text
+authBackend/
+└── src/
+    ├── main/
+    │   ├── java/com/example/authBackend/
+    │   │   ├── Enum/
+    │   │   ├── api/
+    │   │   │   ├── request/
+    │   │   │   └── response/
+    │   │   ├── configuration/
+    │   │   ├── controller/
+    │   │   ├── dto/
+    │   │   ├── exceptions/
+    │   │   ├── filter/
+    │   │   ├── helper/
+    │   │   ├── model/
+    │   │   ├── repository/
+    │   │   ├── security/
+    │   │   │   └── oauth2/
+    │   │   ├── service/
+    │   │   │   └── implementation/
+    │   │   └── utils/
+    │   └── resources/
+    │       ├── application.yaml
+    │       └── application-dev.yml
+    ├── src/test/
+    ├── Dockerfile
+    └── pom.xml
+
+authFrontend/
+├── src/
+├── public/
+├── Dockerfile
+├── nginx.conf
+└── package.json
+
+docker-compose.yml
+.github/
+└── workflows/
+    └── ci.yml
 ```
 
-The available roles are defined in:
+The exact package and file names may evolve as the project changes.
 
-```text
-Enum/Role.java
-```
+------------------------------------------------------------------------
 
----
+## API endpoints
 
-## Pagination and Sorting
+### Authentication
 
-User listing supports pagination and sorting.
+  ------------------------------------------------------------------------------
+  Method                  Endpoint                       Purpose
+  ----------------------- ------------------------------ -----------------------
+  POST                    `/api/v1/auth/register`        Register a user
 
-Example:
+  POST                    `/api/v1/auth/login`           Email/password login
 
-```http
+  POST                    `/api/v1/auth/refresh`         Rotate tokens
+
+  POST                    `/api/v1/auth/logout`          Revoke refresh token
+                                                         and log out
+
+  POST                    `/api/v1/auth/verifyEmail`     Start email/OTP
+                                                         verification flow
+
+  POST                    `/api/v1/auth/verifyOtp`       Verify OTP
+
+  POST                    `/api/v1/auth/resetPassword`   Reset password
+  ------------------------------------------------------------------------------
+
+### User management
+
+  Method   Endpoint                          Purpose
+  -------- --------------------------------- ----------------------
+  GET      `/api/v1/users`                   Get paginated users
+  POST     `/api/v1/users`                   Create a user
+  PUT      `/api/v1/users/{userId}`          Update a user
+  DELETE   `/api/v1/users/{userId}`          Delete a user
+  GET      `/api/v1/users/byEmail/{email}`   Find a user by email
+
+Example pagination request:
+
+``` http
 GET /api/v1/users?pageNumber=0&pageSize=10&sortBy=name&sortOrder=asc
 ```
 
-Spring Data's `Pageable` mechanism is used internally.
+OAuth2 login is initiated through Spring Security authorization
+endpoints:
 
-Pagination helps:
-
-* Avoid loading every user at once
-* Reduce database load
-* Improve API performance
-* Scale better for larger datasets
-
----
-
-## API Endpoints
-
-### Authentication APIs
-
-| Method | Endpoint                     | Description                        |
-| ------ | ---------------------------- | ---------------------------------- |
-| POST   | `/api/v1/auth/register`      | Register a new user                |
-| POST   | `/api/v1/auth/login`         | Login with email/password          |
-| POST   | `/api/v1/auth/refresh`       | Generate new access/refresh tokens |
-| POST   | `/api/v1/auth/logout`        | Logout and revoke refresh token    |
-| POST   | `/api/v1/auth/verifyEmail`   | Send password-reset OTP            |
-| POST   | `/api/v1/auth/verifyOtp`     | Verify OTP                         |
-| POST   | `/api/v1/auth/resetPassword` | Reset password                     |
-
-### User APIs
-
-| Method | Endpoint                        | Description         |
-| ------ | ------------------------------- | ------------------- |
-| GET    | `/api/v1/users`                 | Get paginated users |
-| POST   | `/api/v1/users`                 | Create a user       |
-| PUT    | `/api/v1/users/{userId}`        | Update a user       |
-| DELETE | `/api/v1/users/{userId}`        | Delete a user       |
-| GET    | `/api/v1/users/byEmail/{email}` | Get user by email   |
-
----
-
-## JWT Design
-
-The application uses two types of JWT:
-
-### Access Token
-
-The access token contains information such as:
-
-```text
-User ID
-Email
-Roles
-Issuer
-Issued Time
-Expiration Time
-Token Type = access
+``` text
+/oauth2/authorization/google
+/oauth2/authorization/github
 ```
 
-### Refresh Token
-
-The refresh token contains:
-
-```text
-User ID
-Issuer
-Issued Time
-Expiration Time
-JTI
-Token Type = refresh
-```
-
-The JWT algorithm used by the application is:
-
-```text
-HS512
-```
-
-The JWT secret must be at least **64 characters** long.
-
----
-
-## Cookie Security
-
-Authentication tokens can be attached to cookies with configurable properties:
-
-```yaml
-security:
-  jwt:
-    refresh-token-cookie-name: ${JWT_REFRESH_TOKEN_COOKIE_NAME}
-    access-token-cookie-name: ${JWT_ACCESS_TOKEN_COOKIE_NAME}
-    cookie-secure: ${JWT_COOKIE_SECURE}
-    cookie-http-only: ${JWT_COOKIE_HTTP_ONLY}
-    cookie-same-site: ${JWT_COOKIE_SAME_SITE}
-    cookie-domain: ${JWT_COOKIE_DOMAIN}
-```
-
-This allows cookie behavior to be configured separately for development and production environments.
-
----
-
-## Database
-
-The application uses MySQL for persistence.
-
-```text
-MySQL
-   |
-   ├── User
-   ├── RefreshToken
-   └── ForgetPassword
-```
-
-Hibernate/JPA handles database persistence.
-
-The development configuration uses:
-
-```yaml
-spring:
-  jpa:
-    hibernate:
-      ddl-auto: update
-```
-
-For production environments, database migration tools such as **Flyway** or **Liquibase** would be preferable to relying on `ddl-auto: update`.
-
----
+------------------------------------------------------------------------
 
 ## Configuration
 
-The application uses environment variables for sensitive configuration instead of hardcoding credentials.
+Use environment variables for secrets and environment-specific settings.
+Do not commit real credentials.
 
-Required configuration includes:
+The application configuration includes:
 
-```text
+``` text
 MYSQL_URL
 MYSQL_ROOT_USERNAME
 MYSQL_ROOT_PASSWORD
@@ -630,290 +411,250 @@ OTP_VALIDATION_TIME
 
 GOOGLE_CLIENT_ID
 GOOGLE_CLIENT_SECRET
-
 GITHUB_CLIENT_ID
 GITHUB_CLIENT_SECRET
 ```
 
-Never commit sensitive values such as:
+Create local environment files based on the variables referenced by your
+configuration. Keep `.env` files out of Git. Use dummy credentials only
+in test configuration.
 
-```text
-JWT_SECRET
-MYSQL_ROOT_PASSWORD
-SMTP_PASSWORD
-GOOGLE_CLIENT_SECRET
-GITHUB_CLIENT_SECRET
-```
+**Never commit** JWT secrets, database passwords, SMTP credentials, or
+OAuth client secrets. If a real secret is accidentally committed, rotate
+it; adding it to `.gitignore` does not remove it from Git history.
 
-to a public repository.
+------------------------------------------------------------------------
 
----
-
-## Running the Project Locally
+## Run locally
 
 ### Prerequisites
 
-Install:
+-   Java 21
+-   Maven
+-   MySQL
+-   Node.js 22 and npm
+-   Git
 
-* Java 21
-* Maven
-* MySQL
-* Git
+### Backend
 
-### 1. Clone the Repository
+1.  Clone the repository:
 
-```bash
+``` bash
 git clone https://github.com/swatishaw1/Auth_System.git
-```
-
-### 2. Enter the Backend Directory
-
-```bash
 cd Auth_System/authBackend
 ```
 
-### 3. Configure Environment Variables
+2.  Configure the required environment variables.
+3.  Create the MySQL database and configure the JDBC URL and
+    credentials.
+4.  Start the backend:
 
-Set the required environment variables listed in the configuration section.
-
-### 4. Create the MySQL Database
-
-Create a MySQL database and configure the following environment variables:
-
-```text
-MYSQL_URL
-MYSQL_ROOT_USERNAME
-MYSQL_ROOT_PASSWORD
-```
-
-### 5. Run the Application
-
-Using Maven:
-
-```bash
+``` bash
 mvn spring-boot:run
 ```
 
-Or using the Maven wrapper.
+Or use the Maven wrapper:
 
-#### Windows
-
-```bash
-mvnw.cmd spring-boot:run
+``` powershell
+# Windows
+.\mvnw.cmd spring-boot:run
 ```
 
-#### Linux/macOS
-
-```bash
+``` bash
+# Linux/macOS
 ./mvnw spring-boot:run
 ```
 
-The application runs by default on:
+### Frontend
 
-```text
-http://localhost:8080
+Open another terminal:
+
+``` bash
+cd Auth_System/authFrontend
+npm ci
+npm run dev
 ```
 
----
+Configure the frontend API base URL according to the frontend
+environment configuration. For the Docker/Nginx setup, the API base path
+is `/api/v1`.
 
-## API Documentation
+------------------------------------------------------------------------
 
-The project includes **SpringDoc OpenAPI** support.
+## Run with Docker Compose
 
-After starting the application, Swagger UI can be accessed at:
+The repository includes Dockerfiles for the backend and frontend, plus a
+Compose setup for MySQL and the application.
 
-```text
+From the repository root, configure the root `.env` file with the
+variables required by `docker-compose.yml`, then run:
+
+``` bash
+docker compose up --build -d
+```
+
+Check running containers:
+
+``` bash
+docker compose ps
+```
+
+View logs:
+
+``` bash
+docker compose logs -f
+```
+
+Stop the application:
+
+``` bash
+docker compose down
+```
+
+The frontend is exposed at:
+
+``` text
+http://localhost:3000
+```
+
+The Compose setup uses a persistent MySQL volume. **Do not use
+`docker compose down -v` unless you intentionally want to delete the
+database volume and its data.**
+
+------------------------------------------------------------------------
+
+## Tests
+
+Run backend tests:
+
+``` bash
+cd authBackend
+mvn --batch-mode clean verify
+```
+
+Run frontend checks:
+
+``` bash
+cd authFrontend
+npm ci
+npm run typecheck
+npm run test:ci
+npm run build
+```
+
+Run ESLint locally:
+
+``` bash
+npm run lint
+```
+
+The current CI workflow runs ESLint as a non-blocking step temporarily.
+A green workflow therefore does not necessarily mean the lint rules
+pass. Type checking, frontend tests, and the production build remain
+separate checks.
+
+------------------------------------------------------------------------
+
+## Continuous Integration
+
+GitHub Actions is configured in `.github/workflows/ci.yml`.
+
+The workflow includes:
+
+1.  **Backend tests:** Java 21 and Maven tests, with a MySQL service.
+2.  **Frontend checks:** dependency installation, ESLint, TypeScript
+    checking, frontend tests, and production build.
+3.  **MySQL smoke tests:** verify the MySQL service, database, and basic
+    SQL operations.
+4.  **Docker builds:** build backend and frontend images after the
+    required test jobs succeed.
+
+This is a CI workflow. Building images in GitHub Actions does not by
+itself publish them to a registry or deploy the application.
+
+------------------------------------------------------------------------
+
+## API documentation and Postman
+
+Swagger UI:
+
+``` text
 http://localhost:8080/swagger-ui/index.html
 ```
 
-Swagger can be used to:
+A Postman collection is included in the backend project:
 
-* Explore available endpoints
-* View request and response models
-* Test APIs
-* Understand API contracts
-
----
-
-## Postman
-
-A Postman collection is included in the project:
-
-```text
+``` text
 Auth System.postman_collection.json
 ```
 
-Import the collection into Postman to test the authentication and user-management APIs.
+Import it into Postman to exercise the authentication and
+user-management endpoints.
 
-### Authentication Testing Flow
+Suggested manual authentication flow:
 
-```text
-1. Register
-      |
-      v
-2. Login
-      |
-      v
-3. Access Protected API
-      |
-      v
-4. Refresh Token
-      |
-      v
-5. Logout
+``` text
+Register -> Login -> Call protected API -> Refresh -> Logout
 ```
 
-### Password Recovery Testing Flow
+Suggested password-recovery flow:
 
-```text
-1. verifyEmail
-      |
-      v
-2. Check Email
-      |
-      v
-3. verifyOtp
-      |
-      v
-4. resetPassword
+``` text
+Start recovery -> Receive OTP -> Verify OTP -> Reset password
 ```
 
----
+------------------------------------------------------------------------
 
-## Security Practices Implemented
+## Security considerations and current limitations
 
-* BCrypt password hashing
-* JWT signature validation
-* Separate access and refresh token types
-* Refresh-token rotation
-* Refresh-token revocation
-* HttpOnly cookie configuration
-* Configurable Secure and SameSite cookie attributes
-* OAuth2 provider validation
-* Account enabled checks
-* Role-based authorities
-* No-store headers for authentication responses
-* Environment-based secret configuration
-* Global exception handling
-* Request validation
+-   Passwords are hashed with BCrypt.
+-   JWT signatures, expiry, and token types are validated.
+-   Refresh tokens are tracked and can be rotated or revoked.
+-   Authentication cookies have configurable security attributes.
+-   Secrets are supplied through environment configuration.
+-   Rate limiting is in-process with Resilience4j; it is not distributed
+    across multiple backend instances.
+-   Cookie-based authentication requires a deliberate CSRF strategy.
+    HttpOnly prevents JavaScript from reading a cookie, but does not by
+    itself prevent CSRF.
+-   Production deployments should use managed secrets, HTTPS, database
+    migrations, monitoring, and a shared rate-limit strategy if multiple
+    backend instances are used.
 
----
+------------------------------------------------------------------------
 
-## Design Decisions
+## Concepts demonstrated
 
-### DTOs Instead of Exposing Entities
+-   Layered architecture and REST API design.
+-   Spring Security filter chain and JWT authentication.
+-   Access/refresh token lifecycle, rotation, and revocation.
+-   OAuth2 authorization-code login and provider-specific user mapping.
+-   Cookie security and browser authentication considerations.
+-   Role-based authorization.
+-   OTP expiry and password recovery.
+-   Rate limiting and Spring AOP.
+-   Unit and integration testing with JUnit 5 and Mockito.
+-   MySQL persistence, JPA, pagination, and validation.
+-   Docker images, Compose networking, volumes, and Nginx reverse proxy.
+-   GitHub Actions continuous integration.
 
-The API uses DTOs such as:
+------------------------------------------------------------------------
 
-```text
-UserDTO
-RoleDTO
-TokenResponse
-UserResponse
-```
+## Future improvements
 
-This reduces direct coupling between the database model and API contract.
+-   Distributed rate limiting using a shared store such as Redis.
+-   Account lockout and more granular OTP attempt controls.
+-   Database migrations with Flyway or Liquibase.
+-   Stronger CSRF protection and security testing for cookie-based
+    flows.
+-   More comprehensive end-to-end tests.
+-   Centralized logging, metrics, and monitoring.
+-   Automated image publishing and deployment.
 
-### Service Layer
-
-Business logic is separated from controllers:
-
-```text
-Controller
-    |
-    v
-Service
-    |
-    v
-Repository
-```
-
-This keeps controllers focused on handling HTTP requests while business logic remains inside the service layer.
-
-### Provider Enum
-
-Authentication providers are explicitly represented:
-
-```text
-LOCAL
-GOOGLE
-GITHUB
-```
-
-This provides a clear way to distinguish authentication methods and makes the authentication architecture easier to extend.
-
-### Refresh Token Persistence
-
-Refresh tokens are tracked using persistent refresh-token records.
-
-This allows the application to:
-
-* Rotate tokens
-* Revoke tokens
-* Track token identifiers
-* Invalidate sessions during logout
-
----
-
-## Future Improvements
-
-The current implementation can be further strengthened by adding:
-
-* Flyway or Liquibase database migrations
-* Automated integration tests
-* Unit tests for authentication services
-* Rate limiting for login and OTP endpoints
-* Account lockout after repeated failed logins
-* OTP attempt limits
-* Email verification during registration
-* Redis-based token/session management
-* CSRF strategy documentation for cookie-based authentication
-* Production Docker configuration
-* CI/CD pipeline
-* Production monitoring and logging
-* More granular role and permission management
-
----
-
-## What This Project Demonstrates
-
-This project demonstrates practical backend concepts beyond basic CRUD:
-
-```text
-Spring Boot
-     |
-Spring Security
-     |
-JWT Authentication
-     |
-Refresh Token Rotation
-     |
-OAuth2
-     |
-Role-Based Authorization
-     |
-OTP Password Recovery
-     |
-Email Integration
-     |
-MySQL / JPA
-     |
-Pagination
-     |
-Validation
-     |
-Exception Handling
-     |
-REST API Design
-```
-
-The project provides a foundation for applications that require multiple authentication providers, secure token handling, user management, and a layered backend architecture.
-
----
+------------------------------------------------------------------------
 
 ## Author
 
 **Swati**
 
-GitHub:
-https://github.com/swatishaw1
+-   GitHub: https://github.com/swatishaw1
