@@ -71,28 +71,23 @@ testing, CI, and containerization.
 
 ------------------------------------------------------------------------
 
-## Tech stack
+## Tech Stack
 
-  Technology                    Purpose
-  ----------------------------- -------------------------------------------
-  Java 21                       Backend language
-  Spring Boot 4.0.5             Backend framework
-  Spring Security               Authentication and authorization
-  Spring Data JPA / Hibernate   Persistence and ORM
-  MySQL 8.4                     Relational database
-  JJWT 0.13.0                   JWT creation and validation
-  OAuth2 Client                 Google and GitHub login
-  Spring Mail                   OTP and recovery emails
-  Resilience4j                  Rate limiting
-  JUnit 5 / Mockito             Backend testing
-  React / TypeScript / Vite     Frontend
-  Axios                         Frontend HTTP requests
-  Nginx                         Frontend web server and API reverse proxy
-  Docker / Docker Compose       Containerization and local orchestration
-  GitHub Actions                Continuous integration
-  SpringDoc OpenAPI             API documentation
-  Maven / npm                   Build and dependency management
-
+| Category | Technology | Purpose |
+|---|---|---|
+| **Backend** | Java 21, Spring Boot 4.0.5 | Backend development |
+| **Security** | Spring Security, JWT 0.13.0, OAuth2 | Authentication and authorization |
+| **Database** | MySQL 8.4, Spring Data JPA, Hibernate | Data storage and ORM |
+| **Email** | Spring Mail | OTP and recovery emails |
+| **Rate Limiting** | Resilience4j | API rate limiting |
+| **Testing** | JUnit 5, Mockito | Backend unit and integration testing |
+| **Frontend** | React, TypeScript, Vite | User interface |
+| **HTTP Client** | Axios | Frontend API requests |
+| **Web Server** | Nginx | Static hosting and reverse proxy |
+| **Containerization** | Docker, Docker Compose | Containerization and local orchestration |
+| **CI/CD** | GitHub Actions | Automated testing and CI |
+| **API Documentation** | SpringDoc OpenAPI | API documentation |
+| **Build Tools** | Maven, npm | Dependency and build management |
 ------------------------------------------------------------------------
 
 ## Architecture
