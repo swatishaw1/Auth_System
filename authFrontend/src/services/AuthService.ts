@@ -1,5 +1,5 @@
 import ApiClient from "@/configuration/ApiClient";
-import type LoginData from "@/models/loginData";
+import type LoginData from "@/models/LoginData";
 import type LoginResponseData from "@/models/LoginResponseData";
 import type RegisterData from "@/models/RegisterData";
 import type User from "@/models/User";

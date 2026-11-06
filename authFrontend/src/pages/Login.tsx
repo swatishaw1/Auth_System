@@ -1,4 +1,4 @@
-import { FaGithub } from "react-icons/fa";
+
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
@@ -6,9 +6,9 @@ import { Label } from "../components/ui/label";
 import { NavLink, useNavigate } from "react-router";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { loginUser } from "@/services/AuthService";
-import type LoginData from "@/models/loginData";
-import type ErrorResponse from "@/response/ErrorResponse";
+
+import type LoginData from "@/models/LoginData";
+
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircleIcon } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
@@ -18,7 +18,7 @@ import OAuth2Buttons from "@/components/OAuth2Buttons";
 export default function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const login = useAuth(state => state.login);
   const [loginData, setLoginData] = useState<LoginData>({
     email: "",

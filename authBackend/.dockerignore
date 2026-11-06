@@ -1,0 +1,31 @@
+
+# Maven build output
+target/
+
+# Git
+.git/
+.gitignore
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+logs/
+
+# Environment files and secrets
+.env
+.env.*
+*.pem
+*.key
+secrets/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak

@@ -1,0 +1,59 @@
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: auth-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: auth_db
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - authsystem-nw
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$${MYSQL_ROOT_PASSWORD}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./authBackend
+      dockerfile: Dockerfile
+    image: 1321405/auth-backend:2.0
+    container_name: auth-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      MYSQL_URL: jdbc:mysql://mysql:3306/auth_db
+      MYSQL_ROOT_USERNAME: root
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - authsystem-nw
+
+  frontend:
+    build:
+      context: ./authFrontend
+      dockerfile: Dockerfile
+    image: 1321405/auth-frontend:2.0
+    container_name: auth-frontend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:80"
+    depends_on:
+      - backend
+    networks:
+      - authsystem-nw
+
+volumes:
+  mysql_data:
+
+networks:
+  authsystem-nw:
+    driver: bridge

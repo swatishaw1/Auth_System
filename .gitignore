@@ -1,0 +1,6 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+DockerWorkFlow.doc

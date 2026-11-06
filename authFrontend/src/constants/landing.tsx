@@ -1,4 +1,4 @@
-import { ShieldCheck, UserCog, KeyRound, Building2, Layers3, ShieldEllipsis, Users, LockKeyhole, Plug, Database } from "lucide-react";
+import { ShieldCheck, KeyRound, ShieldEllipsis, Users, LockKeyhole, Plug, Database } from "lucide-react";
 
 export const features = [
     {

@@ -1,0 +1,5 @@
+docker build -t auth-backend:1.0 .
+docker rm -f auth-backend
+docker run -d --name auth-backend --env-file .env -p 8080:8080 auth-backend:1.0
+docker tag auth-backend:1.0 1321405/auth-backend:1.0
+docker push 1321405/auth-backend:1.0

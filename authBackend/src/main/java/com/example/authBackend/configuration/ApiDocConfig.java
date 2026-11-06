@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
                         url = "https://github.com/swatishaw1",
                         email = "swatishaw104@gmail.com"
                 ),
-                summary = "This is a multitenant Auth System Where we used JWT + Refresh Token + OAUTH2"
+                summary = "This is a Auth System Where we used JWT + Refresh Token + OAUTH2"
         ),
         security = {
                 @SecurityRequirement(

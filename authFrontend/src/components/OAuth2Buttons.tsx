@@ -4,8 +4,7 @@ import { Button } from "./ui/button";
 function OAuth2Buttons() {
 
   const handleGoogleLogin = () => {
-        const backendUrl =
-        import.meta.env.VITE_API_BASE_BACKEND_URL || "http://localhost:8080";
+        const backendUrl = import.meta.env.VITE_API_BASE_BACKEND_URL || "http://localhost:8080";
         window.location.href = `${backendUrl}/oauth2/authorization/google`;
   };
 

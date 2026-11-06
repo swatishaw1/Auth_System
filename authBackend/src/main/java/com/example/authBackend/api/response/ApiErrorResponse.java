@@ -1,5 +1,7 @@
 package com.example.authBackend.api.response;
 
+import lombok.Getter;
+
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 

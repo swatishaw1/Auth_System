@@ -1,0 +1,35 @@
+
+# Git
+.git
+.gitignore
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea
+.vscode
+*.iml
+
+# Node
+node_modules
+**/node_modules
+dist
+**/dist
+
+# Maven / Java
+**/target
+
+# Logs
+*.log
+logs
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
